@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 			size_t index2 = string::npos;
 			if (index != string::npos)
 			{
-				ofs << temp.substr(0, index) << ".o: $(SRCDIR)/" << temp.substr(0, index) << ".c ";
+				ofs << "$(OBJDIR)/" << temp.substr(0, index) << ".o: $(SRCDIR)/" << temp.substr(0, index) << ".c ";
 				for (size_t index_tmp = index + 1; index_tmp != string::npos;)
 				{
 					index2 = temp.find_first_of(':', index_tmp);
@@ -129,9 +129,9 @@ int main(int argc, char **argv)
 			}
 			else
 			{
-				ofs << temp << ".o: $(SRCDIR)/" << temp << ".c" << endl;
+				ofs << "$(OBJDIR)/" <<  temp << ".o: $(SRCDIR)/" << temp << ".c" << endl;
 			}
-			ofs << "\t$(CC) -o $(OBJDIR)/$@ -c $< $(CFLAGS)" << endl << endl;
+			ofs << "\t$(CC) -o $@ -c $< $(CFLAGS)" << endl << endl;
 		}
 
 		ofs << "clean: " << endl;
