@@ -12,10 +12,10 @@ int main(int argc, char **argv)
 	{
 		string ld = "gcc";
 		string ldflags = "";
-		string includedir = "";
+		string includedir = ".";
 		string cflags = " -Wall -Wextra -Werror ";
-		string srcdir = "";
-		string objdir = "";
+		string srcdir = ".";
+		string objdir = ".";
 		for (int i = 2; i < argc; ++i)
 		{
 			string tmp = argv[i];
