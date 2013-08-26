@@ -82,9 +82,9 @@ int main(int argc, char **argv)
 		}
 		ofs << endl;
 
-		ofs << "EXEC = " << argv[1] << endl << endl;
-		ofs << "all: $(EXEC)" << endl << endl;
-		ofs << "$(EXEC): ";
+		ofs << "NAME = " << argv[1] << endl << endl;
+		ofs << "all: $(NAME)" << endl << endl;
+		ofs << "$(NAME): ";
 		for(int i = 2; i < argc;++i)
 		{
 			string tmp = argv[i];
@@ -99,9 +99,9 @@ int main(int argc, char **argv)
 		}
 		ofs << endl;
 		if (ld == "gcc")
-			ofs << "\t$(LD) -o $(EXEC) $^ $(LIBS) $(LDFLAGS)" << endl << endl;
+			ofs << "\t$(LD) -o $(NAME) $^ $(LIBS) $(LDFLAGS)" << endl << endl;
 		else if (ld == "ar")
-			ofs << "\t$(LD) cr $(EXEC).a $^ $(LDFLAGS)" << endl << endl;
+			ofs << "\t$(LD) cr $(NAME).a $^ $(LDFLAGS)" << endl << endl;
 		for (int i = 2; i < argc;++i)
 		{
 			string temp = argv[i];
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 			{
 				ofs << "$(OBJDIR)/" <<  temp << ".o: $(SRCDIR)/" << temp << ".c" << endl;
 			}
-			ofs << "\t$(CC) -o $@ -c $< $(CFLAGS)" << endl << endl;
+			ofs << "\t$(CC) -I$(INCLUDEDIR) -o $@ -c $< $(CFLAGS)" << endl << endl;
 		}
 
 		ofs << "clean: " << endl;
@@ -148,9 +148,9 @@ int main(int argc, char **argv)
 
 		ofs << "fclean: clean" << endl;
 		if (ld == "gcc")
-			ofs << "\t/bin/rm -f $(EXEC)" << endl << endl;
+			ofs << "\t/bin/rm -f $(NAME)" << endl << endl;
 		else if (ld == "ar")
-			ofs << "\t/bin/rm -f $(EXEC).a" << endl << endl;
+			ofs << "\t/bin/rm -f $(NAME).a" << endl << endl;
 
 		ofs << "re: fclean all" << endl << endl;
 		ofs << ".PHONY: clean fclean re all" << endl;

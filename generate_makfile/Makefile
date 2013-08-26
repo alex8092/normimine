@@ -1,20 +1,22 @@
+LD = gcc
+LDFLAGS = 
+INCLUDEDIR = .
+SRCDIR = .
+OBJDIR = .
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra
-LIBS = -L../ex00/ -lft
+CFLAGS =  -Wall -Wextra -Werror 
+LIBS = 
 EXEC = prog
 
 all: $(EXEC)
 
-$(EXEC): main.o 
-	$(CC) -o $(EXEC) $^ $(LIBS)
-
-%.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+$(EXEC): 
+	$(LD) -o $(EXEC) $^ $(LIBS) $(LDFLAGS)
 
 clean: 
-	rm -f *.o
+fclean: clean
+	/bin/rm -f $(EXEC)
 
-mrproper: clean
-	rm -f $(EXEC)
+re: fclean all
 
-.PHONY: clean mrproper
+.PHONY: clean fclean re all
