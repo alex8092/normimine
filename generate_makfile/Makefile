@@ -1,13 +1,12 @@
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra
-EXEC = bonjour
+LIBS = -L../ex00/ -lft
+EXEC = prog
 
 all: $(EXEC)
 
-$(EXEC): test.o 
-	$(CC) -o $(EXEC) $^
-
-test.c: test.h
+$(EXEC): main.o 
+	$(CC) -o $(EXEC) $^ $(LIBS)
 
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)
