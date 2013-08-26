@@ -6,16 +6,30 @@ OBJDIR = .
 CC = gcc
 CFLAGS =  -Wall -Wextra -Werror 
 LIBS = 
-EXEC = prog
+SRC = Makefile.c \
+	genmake.c \
+	genmakepp.c \
+	main.cpp.c \
+	mainpp.cpp.c
+OBJS = $(SRC:.c=.o)
+NAME = prog
 
-all: $(EXEC)
+all: $(NAME)
 
-$(EXEC): 
-	$(LD) -o $(EXEC) $^ $(LIBS) $(LDFLAGS)
+$(NAME): $(OBJS)
+	$(LD) -o $(NAME) $^ $(LIBS) $(LDFLAGS)
+
+$(OBJS): 
+	$(CC) -I$(INCLUDEDIR) -o $(OBJDIR)/$*.o -c $(SRCDIR)/$*.c $(CFLAGS)
 
 clean: 
+	/bin/rm -f $(OBJDIR)/Makefile.o
+	/bin/rm -f $(OBJDIR)/genmake.o
+	/bin/rm -f $(OBJDIR)/genmakepp.o
+	/bin/rm -f $(OBJDIR)/main.cpp.o
+	/bin/rm -f $(OBJDIR)/mainpp.cpp.o
 fclean: clean
-	/bin/rm -f $(EXEC)
+	/bin/rm -f $(NAME)
 
 re: fclean all
 

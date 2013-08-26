@@ -2,6 +2,11 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/dir.h>
+#include <sys/param.h>
 
 using namespace std;
 
@@ -77,32 +82,94 @@ int main(int argc, char **argv)
 				{
 					ofs << "-L. -l" << tmp2;
 				}
-			
 			}
 		}
 		ofs << endl;
 
-		ofs << "NAME = " << argv[1] << endl << endl;
-		ofs << "all: $(NAME)" << endl << endl;
-		ofs << "$(NAME): ";
-		for(int i = 2; i < argc;++i)
+		ofs << "SRC = ";
+		bool first = true;
+		for (int i = 2; i < argc;++i)
 		{
 			string tmp = argv[i];
 			if (tmp[0] == ':') continue;
-			size_t index = tmp.find_first_of(':');
-			ofs << "$(OBJDIR)/";
+			string path = "";
+			size_t index = tmp.find_last_of('/');
 			if (index != string::npos)
-				ofs << tmp.substr(0, index);
+			{
+				path = tmp.substr(0, index);
+				tmp = tmp.substr(index + 1, tmp.size() - index - 1);
+			}
+			if (tmp == "*")
+			{
+				if (path == "")
+					path = ".";
+				int count, i;
+				struct direct **files;
+				int file_select();
+				char * str = const_cast<char*>(path.c_str());
+				count = scandir(str, &files, 0, 0);
+
+				/* If no files found, make a non-selectable menu item */
+				if 		(count <= 0)
+					continue;
+				int countbis = 0;
+				for(i=1;i<count+1;++i)
+				{
+					string file = files[i-1]->d_name;
+					if (file.find(".c") != string::npos)
+					{
+						countbis++;
+					}
+				}
+				int j;
+				for (i=1,j=1;i<count+1;++i)
+				{
+					string file = files[i-1]->d_name;
+					if (file.find(".c") != string::npos)
+					{
+						j++;
+						cout << file << endl;
+						if (!first)
+							ofs << "\t";
+						else first = false;
+						ofs << file;
+						if (i + 1 < argc)
+						{
+							ofs << " \\" << endl;
+						}
+						else
+						{
+							if (j < countbis + 1)
+								ofs << " \\" << endl;
+							else
+								ofs << endl;
+						}
+					}
+				}
+			}
 			else
-				ofs << argv[i];
-			ofs << ".o ";
+			{
+				if (!first)
+					ofs << "\t";
+				else first = false;
+				ofs << tmp << ".c";
+				if (i + 1 < argc)
+					ofs << " \\" << endl;
+				else ofs << endl;
+			}
 		}
-		ofs << endl;
+		ofs << "OBJS = $(SRC:.c=.o)" << endl;
+		ofs << "OBJS_PREF = $(addprefix $(OBJDIR)/, $(OBJS))" << endl;
+		ofs << "NAME = " << argv[1] << endl << endl;
+		ofs << "all: $(NAME)" << endl << endl;
+		ofs << "$(NAME): $(OBJS)" << endl;
 		if (ld == "gcc")
-			ofs << "\t$(LD) -o $(NAME) $^ $(LIBS) $(LDFLAGS)" << endl << endl;
+			ofs << "\t$(LD) -o $(NAME) $(OBJS_PREF) $(LIBS) $(LDFLAGS)" << endl << endl;
 		else if (ld == "ar")
 			ofs << "\t$(LD) cr $(NAME).a $^ $(LDFLAGS)" << endl << endl;
-		for (int i = 2; i < argc;++i)
+		ofs << "$(OBJS): " << endl;
+		ofs << "\t$(CC) -I$(INCLUDEDIR) -o $(OBJDIR)/$*.o -c $(SRCDIR)/$*.c $(CFLAGS)" << endl << endl;
+		/*for (int i = 2; i < argc;++i)
 		{
 			string temp = argv[i];
 			if (temp[0] == ':') continue;
@@ -110,7 +177,7 @@ int main(int argc, char **argv)
 			size_t index2 = string::npos;
 			if (index != string::npos)
 			{
-				ofs << "$(OBJDIR)/" << temp.substr(0, index) << ".o: $(SRCDIR)/" << temp.substr(0, index) << ".c ";
+				ofs << "$(OBJS): $(SRCDIR)/" << temp.substr(0, index) << ".c ";
 				for (size_t index_tmp = index + 1; index_tmp != string::npos;)
 				{
 					index2 = temp.find_first_of(':', index_tmp);
@@ -129,22 +196,20 @@ int main(int argc, char **argv)
 			}
 			else
 			{
-				ofs << "$(OBJDIR)/" <<  temp << ".o: $(SRCDIR)/" << temp << ".c" << endl;
 			}
-			ofs << "\t$(CC) -I$(INCLUDEDIR) -o $@ -c $< $(CFLAGS)" << endl << endl;
-		}
+		}*/
 
 		ofs << "clean: " << endl;
-		for (int i = 2; i < argc;++i)
+		/*for (int i = 2; i < argc;++i)
 		{
 			string tmp = argv[i];
 			if (tmp[0] == ':') continue;
 			size_t index = tmp.find_first_of(':');
-			if (index != string::npos)
-				ofs << "\t/bin/rm -f $(OBJDIR)/" << tmp.substr(0, index) << ".o" << endl;
-			else
+			if (index != string::npos)*/
+				ofs << "\t/bin/rm -f $(OBJS_PREF)" << endl; ///" << tmp.substr(0, index) << ".o" << endl;
+			/*else
 				ofs << "\t/bin/rm -f $(OBJDIR)/" << tmp << ".o" << endl;
-		}
+		}*/
 
 		ofs << "fclean: clean" << endl;
 		if (ld == "gcc")
