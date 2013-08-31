@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 		if (ld == "gcc")
 			ofs << "\t$(LD) -o $(NAME) $(OBJS_PREF) $(LIBS) $(LDFLAGS)" << endl << endl;
 		else if (ld == "ar")
-			ofs << "\t$(LD) cr $(NAME).a $^ $(LDFLAGS)" << endl << endl;
+			ofs << "\t$(LD) cr $(NAME).a $(OBJS_PREF) $(LDFLAGS)" << endl << endl;
 		ofs << "$(OBJS): " << endl;
 		ofs << "\t$(CC) -I$(INCLUDEDIR) -o $(OBJDIR)/$*.o -c $(SRCDIR)/$*.c $(CFLAGS)" << endl << endl;
 		/*for (int i = 2; i < argc;++i)
