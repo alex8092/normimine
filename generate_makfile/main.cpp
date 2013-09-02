@@ -118,7 +118,8 @@ int main(int argc, char **argv)
 					string file = files[i-1]->d_name;
 					if (file.find(".c") != string::npos)
 					{
-						countbis++;
+						if (file.find(".c.") == string::npos)
+							countbis++;
 					}
 				}
 				int j;
@@ -127,6 +128,8 @@ int main(int argc, char **argv)
 					string file = files[i-1]->d_name;
 					if (file.find(".c") != string::npos)
 					{
+						if (file.find(".c.") != string::npos)
+							continue ;
 						j++;
 						cout << file << endl;
 						if (!first)
